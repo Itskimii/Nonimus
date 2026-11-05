@@ -1,0 +1,3 @@
+if game.PlaceId == 9872472334 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Ivansptra/Nonimus/refs/heads/main/games/evade.lua"))()
+end
