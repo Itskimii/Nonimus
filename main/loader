@@ -1,4 +1,4 @@
-local pantek_kau = {
+local a = {
     96537472072550,
     10324346056,     
     9872472334,     
@@ -10,14 +10,14 @@ local pantek_kau = {
     99214917572799,  
 }
 
-local allowed = false
-for _, id in ipairs(pantek_kau) do
+local b = false
+for _, id in ipairs(a) do
     if game.PlaceId == id then
-        allowed = true
+        b = true
         break
     end
 end
 
-if allowed then
+if b then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Ivansptra/Nonimus/refs/heads/main/games/evade.lua"))()
 end
