@@ -8369,7 +8369,12 @@ function Chloex:Window(guiconfig)
 
 				local configkey = keyfor("Dropdown_", dropdownconfig)
 				local hubdefault = normalize(dropdownconfig.Default)
+				-- NoSave = true: value is never read from / written to the config.
+				local nosave = dropdownconfig.NoSave == true
 				local function savedpref()
+					if nosave then
+						return normalize(hubdefault)
+					end
 					local v = config.data[configkey]
 					if v ~= nil then
 						return normalize(v)
@@ -8648,7 +8653,7 @@ function Chloex:Window(guiconfig)
 				local function apply(value, instant, save, dofire)
 					elevate()
 					dropdownfunc.Value = normalize(value)
-					if save then
+					if save and not nosave then
 						config.data[configkey] = multi and normalize(dropdownfunc.Value) or dropdownfunc.Value
 						config:queuesave()
 					end
@@ -8885,7 +8890,9 @@ function Chloex:Window(guiconfig)
 				countitem = countitem + 1
 				countdropdown = countdropdown + 1
 				yieldbuild()
-				config.elements[configkey] = dropdownfunc
+				if not nosave then
+					config.elements[configkey] = dropdownfunc
+				end
 				registerSearchItem(dropdownconfig.Title, dropdown)
 				return dropdownfunc
 			end
