@@ -816,6 +816,17 @@ config.savequeued = false
 config.activepath = nil
 config.accountpending = false
 
+-- Write an element value into config data and queue an autosave.
+-- Panel-only (meta) elements (Auto Save/Auto Load toggles, config dropdowns, name input...)
+-- are never stored in a config, so changing them must not trigger a save either.
+function config:record(key, value)
+	if metakeys[key] then
+		return
+	end
+	self.data[key] = value
+	self:queuesave()
+end
+
 local function safeencode(value)
 	local ok, encoded = pcall(function()
 		return sv.http:JSONEncode(value)
@@ -1387,7 +1398,9 @@ function config:init(scope)
 		warn("[NONIMUS] Config '" .. autoname .. "' could not be read, using base config")
 	end
 
-	local base = tryread(self:basefile(), 3)
+	-- _base.json only exists because of Auto Save. With Auto Save OFF it must not be
+	-- loaded behind the user's back (that was the "autoload even though it's off" bug).
+	local base = self.autosave and tryread(self:basefile(), 3) or nil
 	if base then
 		for key, value in pairs(extractpayload(base) or {}) do
 			self.data[key] = value
@@ -4511,8 +4524,7 @@ function Chloex:Window(guiconfig)
 			end
 			item.Value = value and true or false
 			if configkey then
-				config.data[configkey] = item.Value
-				config:queuesave()
+				config:record(configkey, item.Value)
 			end
 			render(instant == true)
 			elevate()
@@ -6609,6 +6621,9 @@ function Chloex:Window(guiconfig)
 				local configkey = keyfor("Toggle_", toggleconfig)
 				local hubdefault = toggleconfig.Default and true or false
 				local function savedpref()
+					if metakeys[configkey] then
+						return hubdefault
+					end
 					local v = config.data[configkey]
 					if v ~= nil then
 						return v == true
@@ -6935,8 +6950,7 @@ function Chloex:Window(guiconfig)
 						end)
 					end
 					if save then
-						config.data[configkey] = value
-						config:queuesave()
+						config:record(configkey, value)
 					end
 					if fire and typeof(toggleconfig.Callback) == "function" then
 						elevate()
@@ -7448,8 +7462,7 @@ function Chloex:Window(guiconfig)
 						return
 					end
 					inputfunc.Value = inputtextbox.Text
-					config.data[configkey] = inputtextbox.Text
-					config:queuesave()
+					config:record(configkey, inputtextbox.Text)
 					typedseq = typedseq + 1
 					local seq = typedseq
 					task.delay(0.35, function()
@@ -8654,8 +8667,7 @@ function Chloex:Window(guiconfig)
 					elevate()
 					dropdownfunc.Value = normalize(value)
 					if save and not nosave then
-						config.data[configkey] = multi and normalize(dropdownfunc.Value) or dropdownfunc.Value
-						config:queuesave()
+						config:record(configkey, multi and normalize(dropdownfunc.Value) or dropdownfunc.Value)
 					end
 					for _, entry in ipairs(optionlist) do
 						paint(entry, instant)
