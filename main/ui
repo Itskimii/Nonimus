@@ -717,7 +717,10 @@ for _, class in ipairs(classes) do
 end
 
 local sliceimage = "rbxassetid://3570695787"
-local rowalpha = 0
+-- Slight transparency for every element background (never icons / text).
+-- Kept low on purpose: dark theme turns cheap-looking if it gets glassy.
+local ELEMENT_ALPHA = 0.12
+local rowalpha = ELEMENT_ALPHA
 
 -- Rounded row background. Normally a sliced ImageLabel child named "Bg", but
 -- that child draws OVER its parent (ZIndexBehavior Sibling), which hid every
@@ -1665,6 +1668,7 @@ local function buildnotify(cfg, top)
 	local notifyframereal = instance.frame(notifyframe)
 	notifyframereal.Name = "NotifyFrameReal"
 	notifyframereal.BackgroundColor3 = theme.Card
+	notifyframereal.BackgroundTransparency = ELEMENT_ALPHA
 	notifyframereal.BorderSizePixel = 0
 	notifyframereal.Position = UDim2.new(0, 400, 0, 0)
 	notifyframereal.Size = UDim2.new(1, 0, 1, 0)
@@ -1853,6 +1857,7 @@ function Chloex:Prompt(promptconfig)
 		local notifyframereal = instance.frame(notifyframe)
 		notifyframereal.Name = "NotifyFrameReal"
 		notifyframereal.BackgroundColor3 = theme.Card
+		notifyframereal.BackgroundTransparency = ELEMENT_ALPHA
 		notifyframereal.BorderSizePixel = 0
 		notifyframereal.Position = UDim2.new(0, 400, 0, 0)
 		notifyframereal.Size = UDim2.new(1, 0, 1, 0)
@@ -2267,6 +2272,8 @@ function Chloex:Window(guiconfig)
 		end
 	end
 
+	ELEMENT_ALPHA = math.clamp(tonumber(guiconfig.ElementTransparency or guiconfig.RowTransparency or guiconfig.RowAlpha) or ELEMENT_ALPHA, 0, 0.4)
+	rowalpha = ELEMENT_ALPHA
 	local main
 	if bgAsset then
 		main = instance.imagelabel(dropshadow)
@@ -2293,12 +2300,12 @@ function Chloex:Window(guiconfig)
 		local dim = math.clamp(tonumber(guiconfig.ThemeDim or guiconfig.BackgroundDim) or 0.6, 0, 1)
 		local gray = math.floor((1 - dim) * 255 + 0.5)
 		main.ImageColor3 = Color3.fromRGB(gray, gray, gray)
-		rowalpha = math.clamp(tonumber(guiconfig.RowTransparency or guiconfig.RowAlpha) or 0.15, 0, 0.9)
+		rowalpha = ELEMENT_ALPHA
 	else
-		rowalpha = 0
+		rowalpha = ELEMENT_ALPHA
 		main = instance.frame(dropshadow)
 		main.BackgroundColor3 = theme.Backdrop
-		main.BackgroundTransparency = 0
+		main.BackgroundTransparency = 0.1
 	end
 
 	local mainstroke = instance.uistroke(main)
@@ -2312,6 +2319,7 @@ function Chloex:Window(guiconfig)
 	main.Size = UDim2.new(1, -47, 1, -47)
 
 	local uicorner = instance.uicorner(main)
+	uicorner.CornerRadius = UDim.new(0, 5)
 
 	local top = instance.frame(main)
 	top.Name = "Top"
@@ -2395,6 +2403,7 @@ function Chloex:Window(guiconfig)
 		chip.Size = UDim2.new(0, 0, 0, 22)
 		chip.AutomaticSize = Enum.AutomaticSize.X
 		chip.BackgroundColor3 = theme.Pill
+		chip.BackgroundTransparency = ELEMENT_ALPHA
 		chip.BorderSizePixel = 0
 		instance.uicorner(chip).CornerRadius = UDim.new(0, 5)
 		local chipstroke = instance.uistroke(chip)
@@ -2556,7 +2565,7 @@ function Chloex:Window(guiconfig)
 	searchbox.Position = UDim2.new(1, -94, 0.5, 0)
 	searchbox.Size = UDim2.new(0, isMobile and 110 or 150, 0, 24)
 	searchbox.BackgroundColor3 = theme.Pill
-	searchbox.BackgroundTransparency = 0
+	searchbox.BackgroundTransparency = ELEMENT_ALPHA
 	searchbox.BorderSizePixel = 0
 	searchbox.FontFace = FONT_MEDIUM
 	searchbox.PlaceholderText = "Search"
@@ -2850,7 +2859,7 @@ function Chloex:Window(guiconfig)
 	end
 
 	do
-		local discordlink = "https://comingsoon.com"
+		local discordlink = "https://discord.gg/USWmtFScPa"
 		local discordpill, discordlabel, discordicon = makepill(statusstrip, {
 			Name = "JoinDiscord",
 			LayoutOrder = 2,
@@ -2997,7 +3006,7 @@ function Chloex:Window(guiconfig)
 		dialog.Size = UDim2.new(0, 300, 0, 150)
 		dialog.Position = UDim2.new(0.5, -150, 0.5, -75)
 		dialog.BackgroundColor3 = theme.Card
-		dialog.BackgroundTransparency = 0
+		dialog.BackgroundTransparency = ELEMENT_ALPHA
 		dialog.BorderSizePixel = 0
 		dialog.ZIndex = 51
 		local uicorner3 = instance.uicorner(dialog)
@@ -3034,7 +3043,7 @@ function Chloex:Window(guiconfig)
 		yes.Size = UDim2.new(0.45, -10, 0, 35)
 		yes.Position = UDim2.new(0.05, 0, 1, -55)
 		yes.BackgroundColor3 = theme.Element
-		yes.BackgroundTransparency = 0
+		yes.BackgroundTransparency = ELEMENT_ALPHA
 		yes.AutoButtonColor = true
 		yes.Text = "Yes"
 		yes.FontFace = FONT_BOLD
@@ -3050,7 +3059,7 @@ function Chloex:Window(guiconfig)
 		cancel.Size = UDim2.new(0.45, -10, 0, 35)
 		cancel.Position = UDim2.new(0.5, 10, 1, -55)
 		cancel.BackgroundColor3 = theme.Element
-		cancel.BackgroundTransparency = 0
+		cancel.BackgroundTransparency = ELEMENT_ALPHA
 		cancel.AutoButtonColor = true
 		cancel.Text = "Cancel"
 		cancel.FontFace = FONT_BOLD
@@ -3188,7 +3197,7 @@ function Chloex:Window(guiconfig)
 		applyicon(logofallback, "menu", 48)
 		local function logoplaceholder(on)
 			logofallback.Visible = on
-			mainbutton.BackgroundTransparency = on and 0 or 1
+			mainbutton.BackgroundTransparency = on and ELEMENT_ALPHA or 1
 			mainbutton.BackgroundColor3 = theme.Element
 		end
 		task.spawn(function()
@@ -3338,7 +3347,7 @@ function Chloex:Window(guiconfig)
 		tfeature.Name = "FeatureFrame"
 		tfeature.AnchorPoint = Vector2.new(1, 0.5)
 		tfeature.BackgroundColor3 = theme.Field
-		tfeature.BackgroundTransparency = 0
+		tfeature.BackgroundTransparency = ELEMENT_ALPHA
 		tfeature.BorderSizePixel = 0
 		tfeature.Position = UDim2.new(1, -15, 0.5, 0)
 		tfeature.Size = UDim2.new(0, 38, 0, 19)
@@ -3407,7 +3416,7 @@ function Chloex:Window(guiconfig)
 		local sbar = instance.frame(s)
 		sbar.Name = "SliderBar"
 		sbar.BackgroundColor3 = theme.Bar
-		sbar.BackgroundTransparency = 0
+		sbar.BackgroundTransparency = ELEMENT_ALPHA
 		sbar.Position = UDim2.new(0, 10, 0, 39)
 		sbar.Size = UDim2.new(1, -20, 0, 5)
 		sbar.Active = true
@@ -3439,7 +3448,7 @@ function Chloex:Window(guiconfig)
 		sbubble.Name = "ValueBubble"
 		sbubble.AnchorPoint = Vector2.new(0.5, 1)
 		sbubble.BackgroundColor3 = theme.Element
-		sbubble.BackgroundTransparency = 0
+		sbubble.BackgroundTransparency = ELEMENT_ALPHA
 		sbubble.Position = UDim2.new(0, 0, 0, -10)
 		sbubble.Size = UDim2.new(0, 48, 0, 22)
 		sbubble.Visible = false
@@ -3727,7 +3736,7 @@ function Chloex:Window(guiconfig)
 	dropdownselect.Name = "DropdownSelect"
 	dropdownselect.AnchorPoint = Vector2.new(1, 0.5)
 	dropdownselect.BackgroundColor3 = theme.Element
-	dropdownselect.BackgroundTransparency = 0
+	dropdownselect.BackgroundTransparency = ELEMENT_ALPHA
 	dropdownselect.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	dropdownselect.BorderSizePixel = 0
 	dropdownselect.LayoutOrder = 1
@@ -3747,7 +3756,7 @@ function Chloex:Window(guiconfig)
 	dropdownselectreal.Name = "DropdownSelectReal"
 	dropdownselectreal.AnchorPoint = Vector2.new(0.5, 0.5)
 	dropdownselectreal.BackgroundColor3 = theme.Card
-	dropdownselectreal.BackgroundTransparency = 0
+	dropdownselectreal.BackgroundTransparency = ELEMENT_ALPHA
 	dropdownselectreal.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	dropdownselectreal.BorderSizePixel = 0
 	dropdownselectreal.LayoutOrder = 1
@@ -4016,7 +4025,7 @@ function Chloex:Window(guiconfig)
 			pill.Size = UDim2.new(0, 0, 0, 16)
 			pill.AutomaticSize = Enum.AutomaticSize.X
 			pill.BackgroundColor3 = theme.Field
-			pill.BackgroundTransparency = 0
+			pill.BackgroundTransparency = ELEMENT_ALPHA
 			pill.BorderSizePixel = 0
 			pill.ZIndex = 12
 			instance.uicorner(pill).CornerRadius = UDim.new(0, 4)
@@ -4294,6 +4303,7 @@ function Chloex:Window(guiconfig)
 		local root = instance.frame(floatgui())
 		root.Name = istoggle and "FloatingToggle" or "FloatingButton"
 		root.BackgroundColor3 = theme.Card
+		root.BackgroundTransparency = ELEMENT_ALPHA
 		root.BorderSizePixel = 0
 		root.Size = UDim2.new(0, 120, 0, H)
 		root.Visible = shown and floating.visible
@@ -4339,6 +4349,7 @@ function Chloex:Window(guiconfig)
 			track.Name = "Switch"
 			track.AnchorPoint = Vector2.new(0, 0.5)
 			track.BackgroundColor3 = theme.Field
+			track.BackgroundTransparency = ELEMENT_ALPHA
 			track.BorderSizePixel = 0
 			track.Size = UDim2.new(0, 28, 0, 14)
 			track.ZIndex = 2
@@ -4813,7 +4824,7 @@ function Chloex:Window(guiconfig)
 		tab.LayoutOrder = layoutOrder
 		tab.Size = UDim2.new(1, -6, 0, 28)
 		local tabbg = roundbg(tab, 4, theme.TabActive)
-		tabbg.ImageTransparency = isFirstTab and 0 or 1
+		tabbg.ImageTransparency = isFirstTab and rowalpha or 1
 
 		local tabbutton = instance.textbutton(tab)
 		tabbutton.Name = "TabButton"
@@ -4976,7 +4987,7 @@ function Chloex:Window(guiconfig)
 				return
 			end
 
-			tabbg.ImageTransparency = 0
+			tabbg.ImageTransparency = rowalpha
 			tabname.TextColor3 = theme.Text
 			if tabicon then
 				tabicon.ImageColor3 = theme.Text
@@ -6050,6 +6061,7 @@ function Chloex:Window(guiconfig)
 					badge.Name = "Rank"
 					badge.AnchorPoint = Vector2.new(0, 0.5)
 					badge.BackgroundColor3 = theme.Inner
+					badge.BackgroundTransparency = ELEMENT_ALPHA
 					badge.BorderSizePixel = 0
 					badge.Position = UDim2.new(0, 8, 0.5, 0)
 					badge.Size = UDim2.new(0, 22, 0, 22)
@@ -6722,7 +6734,7 @@ function Chloex:Window(guiconfig)
 					keybtn.Size = UDim2.new(0, 40, 0, 20)
 					keybtn.AutomaticSize = Enum.AutomaticSize.X
 					keybtn.BackgroundColor3 = theme.Field
-					keybtn.BackgroundTransparency = 0
+					keybtn.BackgroundTransparency = ELEMENT_ALPHA
 					keybtn.BorderSizePixel = 0
 					keybtn.TextSize = ts(11)
 					keybtn.TextColor3 = theme.Dim
@@ -7369,7 +7381,7 @@ function Chloex:Window(guiconfig)
 				inputtextbox.TextSize = ts(12)
 				inputtextbox.TextColor3 = theme.Text
 				inputtextbox.BackgroundColor3 = theme.Field
-				inputtextbox.BackgroundTransparency = 0
+				inputtextbox.BackgroundTransparency = ELEMENT_ALPHA
 				inputtextbox.TextXAlignment = Enum.TextXAlignment.Left
 				inputtextbox.ClearTextOnFocus = false
 				inputtextbox.Position = UDim2.new(0, 10, 0, 26)
@@ -7683,7 +7695,7 @@ function Chloex:Window(guiconfig)
 					dialog.Position = UDim2.new(0.5, 0, 0.5, 0)
 					dialog.Size = UDim2.new(0, dw, 0, dh)
 					dialog.BackgroundColor3 = theme.Card
-					dialog.BackgroundTransparency = 0
+					dialog.BackgroundTransparency = ELEMENT_ALPHA
 					dialog.BorderSizePixel = 0
 					dialog.ZIndex = 61
 					instance.uicorner(dialog).CornerRadius = UDim.new(0, 8)
@@ -7810,7 +7822,7 @@ function Chloex:Window(guiconfig)
 
 					local function makefield(x, y, w, label)
 						local field = instance.frame(dialog)
-						field.BackgroundTransparency = 0
+						field.BackgroundTransparency = ELEMENT_ALPHA
 						field.BackgroundColor3 = theme.Field
 						field.BorderSizePixel = 0
 						field.Position = UDim2.new(0, x, 0, y)
@@ -7872,7 +7884,7 @@ function Chloex:Window(guiconfig)
 						btn.ZIndex = 62
 						local normal = primary and guiconfig.Color or theme.Inner
 						local hover = primary and guiconfig.Color:Lerp(Color3.new(1, 1, 1), 0.12) or theme.InnerHover
-						btn.BackgroundTransparency = 0
+						btn.BackgroundTransparency = primary and 0 or ELEMENT_ALPHA
 						btn.BackgroundColor3 = normal
 						btn.BorderSizePixel = 0
 						instance.uicorner(btn).CornerRadius = UDim.new(0, 4)
@@ -8099,7 +8111,7 @@ function Chloex:Window(guiconfig)
 				keybtn.Size = UDim2.new(0, 56, 0, 26)
 				keybtn.AutomaticSize = Enum.AutomaticSize.X
 				keybtn.BackgroundColor3 = theme.Field
-				keybtn.BackgroundTransparency = 0
+				keybtn.BackgroundTransparency = ELEMENT_ALPHA
 				keybtn.BorderSizePixel = 0
 				keybtn.TextSize = ts(12)
 				keybtn.TextColor3 = theme.Dim
@@ -8547,7 +8559,7 @@ function Chloex:Window(guiconfig)
 				searchbox.TextXAlignment = Enum.TextXAlignment.Left
 				searchbox.TextTruncate = Enum.TextTruncate.AtEnd
 				searchbox.BackgroundColor3 = theme.Element
-				searchbox.BackgroundTransparency = 0
+				searchbox.BackgroundTransparency = ELEMENT_ALPHA
 				searchbox.BorderSizePixel = 0
 				searchbox.ClipsDescendants = true
 				searchbox.Size = UDim2.new(1, 0, 0, 26)
