@@ -1,5 +1,3 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Itskimii/Nonimus/refs/heads/main/main/misc"))()
-
 local evade = {
     [96537472072550] = true,
     [10324346056] = true,
